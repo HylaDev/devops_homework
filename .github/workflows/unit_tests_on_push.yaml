@@ -1,13 +1,19 @@
 name: Exécution des tests unitaires
 
+# Définition de l'évènement déclencheur
 on:
   push:
     branches:
       - doscod
-
+# Configuration du jobs
 jobs:
-  test:
+  tests-unitaires:
     runs-on: ubuntu-latest
+
+    # Configuration de la matrix
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x, 18.x]
 
     steps:
     - name: Checkout repository
@@ -16,7 +22,8 @@ jobs:
     - name: Configuration de Node.js
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        with:
+          node-version: ${{ matrix.node-version }}
 
     - name: Installation des dépendances
       run: npm install
