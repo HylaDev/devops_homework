@@ -1,0 +1,66 @@
+name: Test Analyse et Scan securite
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test-unitaires:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+
+      - name: Install dependencies
+        run: npm install
+        working-directory: test
+
+      - name: Run unit tests
+        run: npm test
+        working-directory: test
+
+  analyse-statique:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep analysis
+        run: semgrep --config auto
+
+  scan-securite:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Install npm audit tool
+        run: npm install -g npm-audit
+
+      - name: Run npm audit
+        run: npm audit --production

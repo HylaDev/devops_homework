@@ -1,0 +1,26 @@
+name: Exécution des tests unitaires
+
+on:
+  push:
+    branches:
+      - doscod
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Configuration de Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+
+    - name: Installation des dépendances
+      run: npm install
+
+    - name: Exécution du test
+      run: npm test
+      working-directory: test
