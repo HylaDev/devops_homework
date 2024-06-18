@@ -13,7 +13,7 @@ jobs:
     # Configuration de la matrix
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: ["14.8", "16.9", "18.10"]
 
     steps:
     - name: Checkout repository
