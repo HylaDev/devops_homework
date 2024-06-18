@@ -10,10 +10,6 @@ jobs:
   tests-unitaires:
     runs-on: ubuntu-latest
 
-    # Configuration de la matrix
-    strategy:
-      matrix:
-        node-version: ["14.8", "16.9", "18.10"]
 
     steps:
     - name: Checkout repository
@@ -23,7 +19,7 @@ jobs:
       uses: actions/setup-node@v2
       with:
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: 18.x
 
     - name: Installation des dépendances
       run: npm install
