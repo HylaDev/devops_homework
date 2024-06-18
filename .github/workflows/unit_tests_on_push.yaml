@@ -1,15 +1,13 @@
 name: Exécution des tests unitaires
 
-# Définition de l'évènement déclencheur
 on:
   push:
     branches:
       - doscod
-# Configuration du jobs
-jobs:
-  tests-unitaires:
-    runs-on: ubuntu-latest
 
+jobs:
+  test:
+    runs-on: ubuntu-latest
 
     steps:
     - name: Checkout repository
@@ -18,8 +16,7 @@ jobs:
     - name: Configuration de Node.js
       uses: actions/setup-node@v2
       with:
-        with:
-          node-version: '18'
+        node-version: '14'
 
     - name: Installation des dépendances
       run: npm install
