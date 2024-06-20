@@ -6,7 +6,7 @@ on:
       - doscod
 
 jobs:
-  test:
+  test-unitaires:
     runs-on: ubuntu-latest
 
     steps:

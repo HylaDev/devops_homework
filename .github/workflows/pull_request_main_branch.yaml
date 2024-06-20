@@ -1,11 +1,13 @@
 name: Test Analyse et Scan securite
 
+# Evènement qui déclenchera le workflow
 on:
   pull_request:
     branches:
       - main
 
 jobs:
+  # Job pour les tests unitaires
   test-unitaires:
     runs-on: ubuntu-latest
 
@@ -13,19 +15,20 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
+      - name: Configuration de Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '14'
 
-      - name: Install dependencies
+      - name: Installation des dépendances
         run: npm install
         working-directory: test
 
-      - name: Run unit tests
+      - name: Exécution du test
         run: npm test
         working-directory: test
 
+  # Job pour l'analyse statique du code
   analyse-statique:
     runs-on: ubuntu-latest
 
@@ -33,17 +36,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Python
+      - name: Configuration de Python
         uses: actions/setup-python@v2
         with:
           python-version: '3.x'
 
-      - name: Install Semgrep
+      - name: Installation de Semgrep
         run: pip install semgrep
 
-      - name: Run Semgrep analysis
+      - name: Exécution de Semgrep analysis
         run: semgrep --config auto
 
+  # Job pour le scan de sécurité
   scan-securite:
     runs-on: ubuntu-latest
 
@@ -51,12 +55,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
+      - name: Configuration de Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16.x'
 
-      - name: Install dependencies
+      - name: Installation des dependances
         run: npm install
 
       - name: Install npm audit tool
