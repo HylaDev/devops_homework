@@ -1,117 +1,139 @@
-name: build_and_publish
+name: Build and push docker images
 
 on:
+  
   pull_request:
     branches:
       - main
+  
 
 jobs:
-  # Job pour les tests unitaires
   test-unitaires:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Récupération du code source
+      - name: Checkout du code source
         uses: actions/checkout@v2
 
+      # Configuration de l'environnement Node avec la version 16
       - name: Configuration de Node.js
         uses: actions/setup-node@v2
         with:
-          node-version: '14'
-
+          node-version: '16'
+        
+      # Installation des dépendances Node.js dans le répertoire test
       - name: Installation des dépendances
         run: npm install
         working-directory: test
 
+      # Exécution des tests unitaires
       - name: Exécution du test
         run: npm test
         working-directory: test
 
-  # Job pour l'analyse statique du code
   analyse-statique:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Récupération du code source
+      - name: Checkout du code source
         uses: actions/checkout@v2
 
+      # Configuration de l'environnement Python avec la version 3.10
       - name: Configuration de Python
         uses: actions/setup-python@v2
         with:
-          python-version: '3.x'
+          python-version: '3.10'
 
+      # Installation de Semgrep pour l'analyse statique du code
       - name: Installation de Semgrep
         run: pip install semgrep
 
-      - name: Exécution de Semgrep analysis
+      # Exécution de l'analyse statique avec Semgrep
+      - name: Exécution de Semgrep
         run: semgrep --config auto
 
-  # Job pour le scan de sécurité
   scan-securite:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Récupération du code source
+      - name: Checkout du code source
         uses: actions/checkout@v2
 
+      # Configuration de l'environnement Node.js avec la version 16.x
       - name: Configuration de Node.js
         uses: actions/setup-node@v2
         with:
           node-version: '16.x'
 
+      # Installation des dépendances Node.js
       - name: Installation des dependances
         run: npm install
 
-      - name: Install npm audit tool
+      # Installation de npm-audit globalement
+      - name: Installation de npm-audit
         run: npm install -g npm-audit
 
+      # Exécution de l'audit de sécurité npm
       - name: Run npm audit
         run: npm audit --production
+
   build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
+    # Récupération du code source
+    - name: Checkout du code source
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
+    # Configuration de l'environment Node avec la version 16
+    - name: Configuration de node
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
-
-    - name: Install dependencies
+        node-version: '16'
+    
+    # Installation des dépendances
+    - name: Installation des dépendances
       run: npm install
 
-    - name: Lint Dockerfile with Hadolint
+    # Analyse du dockerfile avec Hadolint
+    - name: Analyse du dockerfile avec Hadolint
       uses: hadolint/hadolint-action@v3.1.0
       with:
         dockerfile: Dockerfile
 
-    - name: Set up Docker Buildx
+    # Configuration de Docker Buildx
+    - name: Configuration de Docker Buildx
       uses: docker/setup-buildx-action@v1
 
-    - name: Log in to Docker Hub
+    # Connexion à Docker Hub avec les identifiants secrets
+    - name: Connexion à Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
 
-    - name: Build and push Docker image
+    # Construction et push de l'image Docker vers Docker Hub
+    - name: Build and push de l'image
       uses: docker/build-push-action@v4
       with:
         context: .
         push: true
-        tags: ${{ secrets.DOCKER_USERNAME }}/my-node-app:latest
+        tags: ${{ secrets.DOCKER_USERNAME }}/nodejs-app:latest
 
-  security-scan:
+  scan-security-trivy:
     runs-on: ubuntu-latest
     needs: build-and-push
 
     steps:
-    - name: Checkout repository
+    # Récupération du code source
+    - name: Checkout du code source
       uses: actions/checkout@v2
-
-    - name: Install Trivy
+    
+    # Installation de trivy pour l'analyse de sécurité de l'image Docker
+    - name: Installation de Trivy
       run: |
         sudo apt-get update
         sudo apt-get install -y wget apt-transport-https gnupg lsb-release
@@ -120,7 +142,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y trivy
 
-    - name: Scan Docker image with Trivy
+    # Scan de l'image Docker avec Trivy pour détecter les vulnérabilités
+    - name: Scan de l'image docker avec trivy
       env:
-        IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/my-node-app:latest
+        IMAGE_NAME: ${{ secrets.DOCKER_USERNAME }}/nodejs-app:latest
       run: trivy image $IMAGE_NAME

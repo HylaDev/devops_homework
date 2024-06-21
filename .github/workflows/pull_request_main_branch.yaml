@@ -44,7 +44,7 @@ jobs:
       - name: Installation de Semgrep
         run: pip install semgrep
 
-      - name: Exécution de Semgrep analysis
+      - name: Exécution de Semgrep
         run: semgrep --config auto
 
   # Job pour le scan de sécurité
