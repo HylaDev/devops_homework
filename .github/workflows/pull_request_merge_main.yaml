@@ -1,26 +1,26 @@
-name: Build and push docker images
-
+name: Test - Analyse code - Scan - Build - Push
 on:
-  
+  # Définition de l'évènement déclencheur
   pull_request:
     branches:
       - main
-  
 
 jobs:
   test-unitaires:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix :
+        node-version: ["14", "16", "18"]
     steps:
       # Récupération du code source
       - name: Checkout du code source
         uses: actions/checkout@v2
 
-      # Configuration de l'environnement Node avec la version 16
-      - name: Configuration de Node.js
+      # Configuration de l'environnement Node avec différentes version de node
+      - name: Configuration de node ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: '16'
+          node-version: ${{ matrix.node-version }}
         
       # Installation des dépendances Node.js dans le répertoire test
       - name: Installation des dépendances
@@ -34,17 +34,19 @@ jobs:
 
   analyse-statique:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix :
+        python-version: ["3.8", "3.9", "3.10"]
     steps:
       # Récupération du code source
       - name: Checkout du code source
         uses: actions/checkout@v2
 
-      # Configuration de l'environnement Python avec la version 3.10
-      - name: Configuration de Python
+      # Configuration de l'environnement Python avec différentes version de python
+      - name: Configuration de Python ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: '3.10'
+          python-version: ${{ matrix.python-version }}
 
       # Installation de Semgrep pour l'analyse statique du code
       - name: Installation de Semgrep
@@ -56,17 +58,19 @@ jobs:
 
   scan-securite:
     runs-on: ubuntu-latest
-
+    strategy:
+      matrix :
+        node-version: ["14", "16", "18"]
     steps:
       # Récupération du code source
       - name: Checkout du code source
         uses: actions/checkout@v2
 
-      # Configuration de l'environnement Node.js avec la version 16.x
-      - name: Configuration de Node.js
+      # Configuration de l'environnement node avec différentes version de node
+      - name: Configuration de node ${{ matrix.node-version }}
         uses: actions/setup-node@v2
         with:
-          node-version: '16.x'
+          node-version: ${{ matrix.node-version }}
 
       # Installation des dépendances Node.js
       - name: Installation des dependances
@@ -82,17 +86,20 @@ jobs:
 
   build-and-push:
     runs-on: ubuntu-latest
-
+    # Définition de différentes version de node
+    strategy:
+      matrix :
+        node-version: ["14", "16", "18"]
     steps:
     # Récupération du code source
     - name: Checkout du code source
       uses: actions/checkout@v2
 
-    # Configuration de l'environment Node avec la version 16
-    - name: Configuration de node
+    # Configuration de l'environment Node avec différentes version de node
+    - name: Configuration de node ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
-        node-version: '16'
+        node-version: ${{ matrix.node-version }}
     
     # Installation des dépendances
     - name: Installation des dépendances
@@ -123,7 +130,7 @@ jobs:
         push: true
         tags: ${{ secrets.DOCKER_USERNAME }}/nodejs-app:latest
 
-  scan-security-trivy:
+  scan-securite-trivy:
     runs-on: ubuntu-latest
     needs: build-and-push
 
