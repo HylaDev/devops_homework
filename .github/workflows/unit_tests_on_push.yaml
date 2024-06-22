@@ -1,6 +1,7 @@
-name: Exécution des tests unitaires
+name: Exécution des tests unitaires - Branche de features
 
 on:
+  # Définition de l'évènement déclencheur
   push:
     branches:
       - doscod
@@ -8,19 +9,26 @@ on:
 jobs:
   test-unitaires:
     runs-on: ubuntu-latest
-
+    # Définition de différentes version de node
+    strategy:
+      matrix :
+        node-version: ["14", "16", "18"]
     steps:
+    # Récupération du code source
     - name: Checkout repository
       uses: actions/checkout@v2
-
-    - name: Configuration de Node.js
+    
+    # Configuration de l'environment node avec différentes versions
+    - name: Configuration de node ${{ matrix.node-version }}
       uses: actions/setup-node@v2
       with:
-        node-version: '14'
-
+        node-version: ${{ matrix.node-version }}
+        
+    # Installation des dépendances dans l'environment node
     - name: Installation des dépendances
       run: npm install
-
+    
+    # Exécution du test
     - name: Exécution du test
       run: npm test
       working-directory: test
